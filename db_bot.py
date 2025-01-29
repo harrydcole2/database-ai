@@ -71,7 +71,7 @@ strategies = {
 }
 
 questions = [
-    "Which classes have the best ratings?",
+    "Which jobs have the best ratings?",
     "Which universities have the best rated jobs?",
     "What user(s) have the most extensive work history?",
     "What jobs have the most benefits?",
