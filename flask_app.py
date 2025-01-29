@@ -6,6 +6,7 @@ from openai import OpenAI
 
 app = Flask(__name__)
 
+# Setup database connection
 fdir = os.path.dirname(__file__)
 def getPath(fname):
     return os.path.join(fdir, fname)
@@ -14,6 +15,7 @@ sqliteDbPath = getPath("aidb.sqlite")
 sqliteCon = sqlite3.connect(sqliteDbPath, check_same_thread=False)
 sqliteCursor = sqliteCon.cursor()
 
+# Load OpenAI config
 configPath = getPath("config.json")
 with open(configPath) as configFile:
     config = json.load(configFile)
@@ -43,15 +45,34 @@ def runSql(query):
     except Exception as e:
         return str(e)
 
-@app.route("/ask", methods=["POST"])
-def ask_question():
+# Strategies
+commonSqlOnlyRequest = " Give me a sqlite select statement that answers the question. Only respond with sqlite syntax. If there is an error do not explain it!"
+with open(getPath("setup.sql")) as setupSqlFile:
+    setupSqlScript = setupSqlFile.read()
+strategies = {
+    "zero_shot": setupSqlScript + commonSqlOnlyRequest,
+    "single_domain_double_shot": (setupSqlScript + 
+                   " Who doesn't have a way for us to text them? " + 
+                   " \nSELECT p.person_id, p.name\nFROM person p\nLEFT JOIN phone ph ON p.person_id = ph.person_id AND ph.can_recieve_sms = 1\nWHERE ph.phone_id IS NULL;\n " +
+                   commonSqlOnlyRequest)
+}
+
+@app.route("/ask/zero_shot", methods=["POST"])
+def ask_zero_shot():
+    return ask_question("zero_shot")
+
+@app.route("/ask/single_domain_double_shot", methods=["POST"])
+def ask_single_domain_double_shot():
+    return ask_question("single_domain_double_shot")
+
+def ask_question(strategy):
     data = request.get_json()
     user_question = data.get("question")
     
     if not user_question:
         return jsonify({"error": "No question provided"}), 400
     
-    sql_query = getChatGptResponse(user_question + " Give me a sqlite select statement that answers the question. Only respond with sqlite syntax.")
+    sql_query = getChatGptResponse(strategies[strategy] + " " + user_question)
     sql_query = sanitizeForJustSql(sql_query)
     query_result = runSql(sql_query)
     
@@ -59,6 +80,7 @@ def ask_question():
     friendly_response = getChatGptResponse(friendly_response_prompt)
     
     return jsonify({
+        "strategy": strategy,
         "question": user_question,
         "sql": sql_query,
         "query_result": query_result,
