@@ -71,14 +71,14 @@ strategies = {
 }
 
 questions = [
-    "Which are the most awarded dogs?",
-    "Which dogs have multiple owners?",
-    "Which people have multiple dogs?",
-    "What are the top 3 cities represented?",
-    "What are the names and cities of the dogs who have awards?",
-    "Who has more than one phone number?",
-    "Who doesn't have a way for us to text them?",
-    "Will we have a problem texting any of the previous award winners?"
+    "Which classes have the best ratings?",
+    "Which universities have the best rated jobs?",
+    "What user(s) have the most extensive work history?",
+    "What jobs have the most benefits?",
+    "Which departments have the best pay?",
+    "What ratings might be untrustworthy?",
+    "What job tags are reused across multiple ratings?",
+    "What users experienced the worst work conditions?"
     # "I need insert sql into my tables can you provide good unique data?"
 ]
 
