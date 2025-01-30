@@ -1,8 +1,8 @@
 from flask import Flask, request, jsonify
-from shared import SharedFunctionality
+import shared
 
 app = Flask(__name__)
-shared = SharedFunctionality()
+shared.initialize()
 
 @app.route("/ask/zero_shot", methods=["POST"])
 def ask_zero_shot():
@@ -35,4 +35,7 @@ def ask_question(strategy):
     })
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    try:
+        app.run(debug=True)
+    finally:
+        shared.close_connections()
