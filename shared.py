@@ -67,8 +67,8 @@ def setup_strategies():
     strategies = {
         "zero_shot": setupSqlScript + commonSqlOnlyRequest,
         "single_domain_double_shot": (setupSqlScript + 
-                    " Who doesn't have a way for us to text them? " + 
-                    " \nSELECT p.person_id, p.name\nFROM person p\nLEFT JOIN phone ph ON p.person_id = ph.person_id AND ph.can_recieve_sms = 1\nWHERE ph.phone_id IS NULL;\n " +
+                    " Which jobs have the best ratings? " + 
+                    "SELECT j.id, j.name, AVG(r.quality_rating) AS avg_quality_rating\nFROM jobs j\nJOIN ratings r ON j.id = r.job_id\nGROUP BY j.id\nORDER BY avg_quality_rating DESC;" +
                     commonSqlOnlyRequest)
     }
 
